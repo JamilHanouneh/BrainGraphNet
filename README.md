@@ -383,13 +383,6 @@ python inference.py \
 ```
 # Generate all visualizations
 python visualize_results.py
-
-# Outputs:
-# - outputs/figures/01_training_summary.png
-# - outputs/figures/02_prediction_comparison.png
-# - outputs/figures/03_scatter_plot.png
-# - outputs/figures/04_error_distribution.png
-# - outputs/figures/05_metrics_summary.png
 ```
 
 ---
@@ -810,7 +803,7 @@ Medical Engineer | AI Research
 
 **Email**: jamil.hanouneh1997@gmail.com  
 **GitHub**: [@jamilhanouneh](https://github.com/jamilhanouneh)  
-**LinkedIn**: [Jamil Hanouneh](https://linkedin.com/in/jamil-hanouneh)  
+**LinkedIn**: [Jamil Hanouneh](https://www.linkedin.com/in/jamil-hanouneh-39922b1b2/)  
 **Institution**: Friedrich-Alexander-Universität Erlangen-Nürnberg (FAU)  
 **Department**: Medical Engineering / Medical Image and Data Processing  
 
