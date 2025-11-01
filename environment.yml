@@ -1,0 +1,60 @@
+name: braingraphnet
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  # Python
+  - python=3.8
+  
+  # Core Deep Learning
+  - pytorch=2.0.1
+  - pytorch-cuda=11.8  # For GPU support, use cpuonly for CPU
+  - torchvision=0.15.2
+  
+  # Scientific Computing
+  - numpy=1.24.3
+  - scipy=1.11.3
+  - pandas=2.0.3
+  - scikit-learn=1.3.0
+  
+  # Neuroimaging
+  - nibabel=5.1.0
+  
+  # Visualization
+  - matplotlib=3.7.2
+  - seaborn=0.12.2
+  
+  # Graph Processing
+  - networkx=3.1
+  
+  # Utilities
+  - pyyaml=6.0.1
+  - tqdm=4.66.1
+  
+  # Development Tools (optional)
+  - jupyter=1.0.0
+  - ipython=8.14.0
+  
+  # Pip packages (PyTorch Geometric not available via conda)
+  - pip
+  - pip:
+    - torch-scatter==2.1.1
+    - torch-sparse==0.6.17
+    - torch-geometric==2.3.1
+    - nilearn==0.10.1
+    - plotly==5.16.1
+    - tensorboard==2.14.0
+    - h5py==3.9.0
+    
+    # Development dependencies (optional)
+    - pytest>=7.0.0
+    - pytest-cov>=4.0.0
+    - black>=23.0.0
+    - flake8>=6.0.0
+    - mypy>=1.0.0
+    - isort>=5.12.0
+
+# Installation instructions:
+# conda env create -f environment.yml
+# conda activate braingraphnet

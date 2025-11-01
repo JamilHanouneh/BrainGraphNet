@@ -1,0 +1,148 @@
+# BrainGraphNet Configuration File
+# =================================
+
+# Project Information
+project:
+  name: "BrainGraphNet"
+  description: "Dynamic Graph Neural Networks for Evolving Functional Connectivity"
+  version: "1.0.0"
+  author: "Medical AI Research"
+
+# Data Configuration
+# data:
+#   # Data source: 'synthetic', 'hcp', or 'custom'
+#   source: 'hcp'
+data:
+  source: 'custom'
+  custom_path: 'data/processed/HCP_connectivity'
+
+  # Synthetic data settings
+  synthetic:
+    num_subjects: 50
+    num_timepoints: 5
+    num_regions: 90  # AAL atlas
+    noise_level: 0.1
+    disease_progression: true
+    save_path: 'data/raw/synthetic'
+  
+  # HCP data settings
+  hcp:
+    data_path: 'data/raw/HCP'
+    num_subjects: 100  # Use subset for faster training
+    connectivity_type: 'correlation'  # 'correlation' or 'partial'
+  
+  # Custom data settings
+  custom_path: 'data/raw/custom'
+  
+  # Brain atlas settings
+  atlas:
+    name: 'AAL'  # Automated Anatomical Labeling
+    # num_regions: 90
+    num_regions: 349  # Schaefer 400 parcels (adjust based on atlas used)
+    labels_file: 'src/utils/aal_labels.csv'
+  
+  # Graph construction
+  graph:
+    threshold_method: 'proportional'  # 'absolute', 'proportional', 'none'
+    threshold_value: 0.15  # Keep top 15% connections
+    min_edge_weight: 0.1
+    self_loops: false
+    weighted: true
+
+# Model Configuration
+model:
+  type: 'EvolveGCN'  # 'EvolveGCN', 'TemporalGCN', or 'Custom'
+  
+  # Architecture
+  architecture:
+    input_dim: 1  # Node features dimension (can add clinical data)
+    hidden_dim: 64
+    output_dim: 32
+    num_layers: 3
+    dropout: 0.3
+    activation: 'relu'
+  
+  # EvolveGCN specific
+  evolve_gcn:
+    rnn_type: 'GRU'  # 'GRU' or 'LSTM'
+    variant: 'H'  # 'H' (evolve hidden) or 'O' (evolve output)
+  
+  # Task configuration
+  task:
+    type: 'connectivity_prediction'  # 'connectivity_prediction' or 'phenotype_classification'
+    prediction_horizon: 1  # Predict connectivity t+1 timesteps ahead
+    
+# Training Configuration
+training:
+  # Basic settings
+  # num_epochs: 100
+  num_epochs: 25
+  batch_size: 8
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  
+  # Data split
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  
+  # Optimization
+  optimizer: 'adam'  # 'adam', 'sgd', 'adamw'
+  scheduler:
+    type: 'step'  # 'step', 'cosine', 'plateau'
+    step_size: 30
+    gamma: 0.5
+  
+  # Early stopping
+  early_stopping:
+    enabled: true
+    patience: 15
+    min_delta: 0.001
+  
+  # Checkpointing
+  checkpoint:
+    save_best: true
+    save_freq: 10  # Save every N epochs
+    max_to_keep: 3
+
+# Evaluation Configuration
+evaluation:
+  metrics:
+    - 'mse'
+    - 'mae'
+    - 'r2'
+    - 'pearson_correlation'
+  
+  visualization:
+    plot_predictions: true
+    plot_brain_networks: true
+    num_samples: 5
+
+# System Configuration
+system:
+  device: 'cpu'  # 'cpu' or 'cuda'
+  num_workers: 4
+  seed: 42
+  deterministic: true
+  
+  # Logging
+  logging:
+    level: 'INFO'  # 'DEBUG', 'INFO', 'WARNING', 'ERROR'
+    save_dir: 'outputs/logs'
+    tensorboard: true
+  
+  # Output paths
+  paths:
+    checkpoints: 'outputs/checkpoints'
+    predictions: 'outputs/predictions'
+    figures: 'outputs/figures'
+    logs: 'outputs/logs'
+
+# Reproducibility
+random_seed: 42
+
+# Citation
+citation:
+  paper: "BrainGraphNet: Dynamic Graph Neural Networks for Evolving Functional Connectivity"
+  dataset: "Synthetic or HCP Young Adult Connectivity Matrices"
+  code_repository: "https://github.com/your-username/BrainGraphNet"
