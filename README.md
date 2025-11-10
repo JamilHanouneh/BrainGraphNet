@@ -61,6 +61,10 @@ Trained on HCP Aging dataset with 50 subjects (349 brain regions, temporal seque
 
 ## Overview
 
+<p align="center">
+  <img src="images/pipeline_overview.png" alt="BrainGraphNet Pipeline" width="95%">
+</p>
+
 BrainGraphNet addresses a critical challenge in neuroscience: **How do functional brain connectivity patterns evolve over time, and can we predict these changes?**
 
 ### Research Questions
@@ -129,56 +133,53 @@ Our results are **competitive with published brain connectivity prediction metho
 
 ## Visual Results
 
-### 1. Prediction Accuracy Scatter Plot
+### Connectivity Prediction Performance
 
-All ~121,400 connectivity values plotted (8 test subjects × 349² regions):
-- **Dense clustering** along diagonal shows accurate predictions
-- **0.74 Pearson correlation** visible as strong positive relationship
-- **Small scatter** indicates consistent model performance
-- Validates generalization to unseen test data
+<p align="center">
+  <img src="images/test_prediction.png" alt="Connectivity Prediction Results" width="100%">
+</p>
 
-### 2. Connectivity Matrix Comparison
+**Three-panel analysis showing model performance:**
 
-Three-panel visualization showing:
-- **Left**: Ground truth connectivity from real fMRI
-- **Middle**: Model prediction
-- **Right**: Difference map (darker = better prediction)
+- **Left Panel**: Ground truth connectivity from real fMRI data (90×90 regional connectivity matrix)
+- **Middle Panel**: Model prediction showing learned connectivity patterns
+- **Right Panel**: Difference map (prediction error) - darker colors indicate larger discrepancies
 
-Key observations:
-- Predicted matrix closely matches ground truth structure
-- Strong diagonal (self-connections) correctly predicted
-- Block structure (regional clustering) preserved
-- Differences are small and relatively random
+**Key Observations**:
+- The model captures the overall connectivity structure effectively
+- Strong diagonal (self-connections) correctly predicted with high accuracy
+- Predicted matrix shows regularized patterns, indicating the model learns generalizable features rather than overfitting to noise
+- Error map displays relatively uniform distribution with no systematic regional bias
+- Average absolute error: 0.225 on [-1, 1] connectivity scale
+- Block structure (functional network organization) is preserved in predictions
 
-### 3. Brain Connectivity Network Graph
+**Quantitative Performance**:
+- **R² Score**: 0.4904 (model explains 49% of connectivity variance)
+- **Pearson Correlation**: 0.7386 (strong positive relationship)
+- **MAE**: 0.2253 (average prediction error)
+- **RMSE**: 0.2740 (root mean squared error)
 
-Visual representation of functional brain networks:
-- **349 nodes** (Gordon333 atlas brain regions)
-- **Blue thick lines** = strong positive connections
-- **Red thin lines** = negative correlations
-- **Circle size** represents connection strength
-- Shows functional hierarchy and modular organization
+### Brain Network Visualization
 
-### 4. Error Distribution
+<p align="center">
+  <img src="images/test_brain_network.png" alt="Brain Connectivity Network" width="85%">
+</p>
 
-**Left histogram**: Error peaks around 0.1-0.2, tapers to near-zero at high errors
-- Most predictions within ±0.3 of ground truth
-- Long tail indicates occasional larger errors
-- Normal distribution shape suggests random, unbiased errors
+**Functional brain connectivity network visualization** (threshold = 0.3 for clarity):
 
-**Right heatmap**: Error map across brain regions
-- Random error pattern (no systematic bias)
-- Consistent errors across all regions
-- No regional specialization or weakness
-- Indicates well-generalized learning
+- **Blue edges**: Positive correlations (functional connectivity between regions)
+- **Red edges**: Negative correlations (anti-correlations between networks)
+- **Node size**: Proportional to connection degree (hub regions appear larger)
+- **Network layout**: Spring-force algorithm revealing functional organization and modular structure
 
-### 5. Training Summary
+**Network Properties**:
+- **349 nodes**: Gordon333 atlas brain regions
+- **Sparse connections**: Only strongest connections shown (top 15% after thresholding)
+- **Hub regions**: Larger nodes indicate highly connected regions (default mode network, attention networks)
+- **Modular organization**: Clustering visible in layout reflects functional brain systems
+- **Balanced connectivity**: Mix of positive (integration) and negative (segregation) connections
 
-Final metrics after 25 epochs:
-- **Train Loss**: 0.2176
-- **Validation Loss**: 0.3440
-- **Best Validation Loss**: 0.3440 (achieved at epoch 5)
-- **Model Saved**: outputs/checkpoints/best_model.pth
+This visualization demonstrates the complex, hierarchical structure of brain connectivity that EvolveGCN learns to model and predict over time. The model successfully captures both local (within-network) and global (between-network) connectivity patterns.
 
 ---
 
@@ -470,29 +471,44 @@ BrainGraphNet/
 
 ### Pipeline Overview
 
-```
-Raw fMRI Data (HCP)
-    ↓
-Extract Time Series (Gordon333 atlas, 349 regions)
-    ↓
-Compute Connectivity Matrices (Pearson correlation)
-    ↓
-Apply Thresholding (keep top 15% connections)
-    ↓
-Build Temporal Graph Sequences (3 timepoints)
-    ↓
-Convert to PyTorch Geometric Graphs
-    ↓
-Train EvolveGCN Model (25 epochs)
-    ↓
-Evaluate on Test Set (R²=0.49, r=0.74)
-    ↓
-Generate Predictions & Visualizations
-```
+<p align="center">
+  <img src="images/pipeline_overview.png" alt="Complete Pipeline" width="90%">
+</p>
+
+The complete pipeline consists of four main stages:
+
+**1. Data Input** 
+- Raw fMRI data from HCP Aging dataset (725 subjects)
+- Extract time series using Gordon333 atlas (349 brain regions)
+- Compute connectivity matrices via Pearson correlation (349×349 per timepoint)
+
+**2. Preprocessing** 
+- Apply thresholding to keep top 15% connections (ensure network sparsity)
+- Create temporal sequences (3 timepoints per subject)
+- Convert to PyTorch Geometric graph format (50 subjects → 150 temporal graphs)
+
+**3. Model Training** 
+- EvolveGCN with 3 GCN layers and 125.9M parameters
+- GRU-based weight evolution across temporal dimension
+- Training: 25 epochs, Adam optimizer, learning rate 0.001
+
+**4. Output & Applications** 
+- Predict future connectivity patterns
+- Applications: disease detection, aging biomarkers, cognitive decline prediction
 
 ### EvolveGCN Architecture
 
+<p align="center">
+  <img src="images/evolvegcn_architecture.png" alt="EvolveGCN Architecture" width="90%">
+</p>
+
 **Key Innovation**: GCN weights evolve over time using RNNs
+Input: Temporal Graph Sequence [G₁, G₂, ..., G_T]
+For each timestamp t:
+Initialize/update GCN weights: W_t = GRU(W_{t-1})
+Apply GCN: H_t = GCN(A_t, X_t, W_t)
+Spatial-temporal aggregation
+Output: Connectivity prediction at t+k
 
 ```
 Input: Temporal Graph Sequence [G_1, G_2, ..., G_T]
@@ -505,18 +521,26 @@ For each timestamp t:
 Output: Connectivity prediction at t+k
 ```
 
+
 **Components**:
 - **3 GCN layers**: 1 → 64 → 32 dimensions
-- **RNN (GRU cells)**: Evolve weight matrices
+- **RNN (GRU cells)**: Evolve weight matrices across time
 - **Output layer**: Predict connectivity via outer product
 - **Total parameters**: 125.9 million
+
+**Architecture Details**:
+- **Temporal Dimension**: Model processes 3 consecutive timepoints (t=1, 2, 3)
+- **Weight Evolution**: GRU cells evolve GCN weights from one timepoint to the next (horizontal arrows)
+- **Spatial Processing**: GCN layers aggregate information across brain regions at each timepoint (vertical flow)
+- **Multi-layer Design**: Three layers progressively reduce dimensionality (1→64→64→32)
+- **Output Generation**: Temporal aggregation followed by outer product projection to predict 349×349 connectivity
 
 ### Loss Function
 
 ```
-Loss = MSE(predictions, targets) 
-       + 0.5 * Correlation_Loss
-       + 0.1 * Temporal_Consistency
+Loss = MSE(predictions, targets)
++ 0.5 * Correlation_Loss
++ 0.1 * Temporal_Consistency
 ```
 
 ---
