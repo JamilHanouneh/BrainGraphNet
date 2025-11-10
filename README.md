@@ -883,10 +883,10 @@ A: Use the BibTeX citation provided above.
 
 If you find this project useful, please consider starring it on GitHub!
 
-⭐ Star this repository  
-👁️ Watch for updates  
-🍴 Fork to contribute  
-💬 Share feedback  
+Star this repository  
+Watch for updates  
+Fork to contribute  
+Share feedback  
 
 ---
 
