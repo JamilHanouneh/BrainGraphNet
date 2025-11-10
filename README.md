@@ -503,18 +503,6 @@ The complete pipeline consists of four main stages:
 </p>
 
 **Key Innovation**: GCN weights evolve over time using RNNs
-Input: Temporal Graph Sequence [G₁, G₂, ..., G_T]
-
-For each timestamp t:
-
-Initialize/update GCN weights: W_t = GRU(W_{t-1})
-
-Apply GCN: H_t = GCN(A_t, X_t, W_t)
-
-Spatial-temporal aggregation
-
-Output: Connectivity prediction at t+k
-
 ```
 Input: Temporal Graph Sequence [G_1, G_2, ..., G_T]
 
