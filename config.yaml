@@ -145,4 +145,4 @@ random_seed: 42
 citation:
   paper: "BrainGraphNet: Dynamic Graph Neural Networks for Evolving Functional Connectivity"
   dataset: "Synthetic or HCP Young Adult Connectivity Matrices"
-  code_repository: "https://github.com/your-username/BrainGraphNet"
+  code_repository: "https://github.com/JamilHanouneh/BrainGraphNet"
